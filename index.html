@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      background-color: #424242;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .calculator {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      background-color: #121212;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .display {
+      background-color: transparent;
+      text-align: right;
+      padding: 20px 10px;
+    }
+
+    .result {
+      font-size: 3rem;
+      font-weight: 300;
+      color: white;
+      word-break: break-all;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding-top: 10px;
+    }
+
+    .btn {
+      aspect-ratio: 1 / 1;
+      font-size: 1.6rem;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    .orange {
+      background-color: #b00020;
+      color: white;
+    }
+
+    .gray {
+      background-color: #ff7300;
+      color: white;
+    }
+
+    .dark {
+      background-color: #2e2e2e;
+      color: white;
+    }
+
+    .btn.wide {
+      grid-column: span 2;
+      border-radius: 35px;
+      aspect-ratio: auto;
+      height: 100%;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display">
+      <div class="result" id="result">0</div>
+    </div>
+    <div class="buttons">
+      <button class="btn gray" data-value="C">C</button>
+      <button class="btn gray" data-value="+/-">+/-</button>
+      <button class="btn gray" data-value="%">%</button>
+      <button class="btn orange" data-value="÷">÷</button>
+
+      <button class="btn dark" data-value="7">7</button>
+      <button class="btn dark" data-value="8">8</button>
+      <button class="btn dark" data-value="9">9</button>
+      <button class="btn orange" data-value="×">×</button>
+
+      <button class="btn dark" data-value="4">4</button>
+      <button class="btn dark" data-value="5">5</button>
+      <button class="btn dark" data-value="6">6</button>
+      <button class="btn orange" data-value="-">−</button>
+
+      <button class="btn dark" data-value="1">1</button>
+      <button class="btn dark" data-value="2">2</button>
+      <button class="btn dark" data-value="3">3</button>
+      <button class="btn orange" data-value="+">+</button>
+
+      <button class="btn dark" data-value="0">0</button>
+      <button class="btn dark" data-value=".">.</button>
+      <button class="btn orange wide" data-value="=">=</button>
+    </div>
+  </div>
+
+  <script>
+    const resultDisplay = document.getElementById("result");
+    let currentInput = "";
+    let evaluated = false;
+
+    const buttons = document.querySelectorAll(".btn");
+
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const value = button.getAttribute("data-value");
+
+        if (value === "C") {
+          currentInput = "";
+          resultDisplay.textContent = "0";
+          return;
+        }
+
+        if (value === "=") {
+          try {
+            let expression = currentInput
+              .replace(/×/g, "*")
+              .replace(/÷/g, "/");
+            const result = eval(expression);
+            resultDisplay.textContent = result;
+            currentInput = result.toString();
+            evaluated = true;
+          } catch {
+            resultDisplay.textContent = "Error";
+            currentInput = "";
+          }
+          return;
+        }
+
+        if (value === "+/-") {
+          if (currentInput) {
+            if (currentInput.startsWith("-")) {
+              currentInput = currentInput.substring(1);
+            } else {
+              currentInput = "-" + currentInput;
+            }
+            resultDisplay.textContent = currentInput;
+          }
+          return;
+        }
+
+        if (value === "%") {
+          try {
+            currentInput = (parseFloat(currentInput) / 100).toString();
+            resultDisplay.textContent = currentInput;
+          } catch {
+            resultDisplay.textContent = "Error";
+            currentInput = "";
+          }
+          return;
+        }
+
+        if (evaluated && !["+", "-", "*", "/"].includes(value)) {
+          currentInput = "";
+          evaluated = false;
+        }
+
+        currentInput += value;
+        resultDisplay.textContent = currentInput;
+      });
+    });
+  </script>
+</body>
+</html>
