@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scientific Calculator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 80vh;
+      width: 100vw;
+      background-color: #434343;
+      font-family: 'Segoe UI', Tahoma, times new roman, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .calculator {
+      width: 100%;
+      max-width: 380px;
+      padding: 20px;
+      background-color: #1e1e1e;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .display {
+  background-color: #3e3e3e;
+  color: white;
+  text-align: right;
+  font-size: 2.8rem;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 400;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  max-height: 6.5rem;
+  overflow-y: auto;
+}
+
+    .buttons-wrapper {
+      background-color: #2e2e2e;
+      padding: 15px;
+      border-radius: 20px;
+    }
+
+    .buttons {
+      padding: 2;
+      display: grid;
+      grid-template-columns: repeat(4, 4fr);
+      gap: 8px;
+      shadow: 7px;
+    }
+
+    .btn {
+      aspect-ratio: 1 / 1;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 20%;
+      font-weight: 5px;
+      cursor: pointer;
+      color: white;
+      box-shadow: 2 5px 10px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+ .btn.orange {
+  background: linear-gradient(to top left, #FFBC05, #D55C02);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.btn.red {
+  background: linear-gradient(to top left, #E70E01, #820402);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.btn.dark {
+  background: linear-gradient(to top left, #5e5e5e, #242424);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display" id="result">0</div>
+    <div class="buttons-wrapper">
+      <div class="buttons">
+        <button class="btn orange" data-value="C">C</button>
+        <button class="btn orange" data-value="+/-">+/-</button>
+        <button class="btn orange" data-value="%">%</button>
+        <button class="btn orange" data-value="√">√</button>
+
+        <button class="btn orange" data-value="sin">sin</button>
+        <button class="btn orange" data-value="cos">cos</button>
+        <button class="btn orange" data-value="tan">tan</button>
+        <button class="btn red" data-value="÷">÷</button>
+
+        <button class="btn dark" data-value="7">7</button>
+        <button class="btn dark" data-value="8">8</button>
+        <button class="btn dark" data-value="9">9</button>
+        <button class="btn red" data-value="×">×</button>
+
+        <button class="btn dark" data-value="4">4</button>
+        <button class="btn dark" data-value="5">5</button>
+        <button class="btn dark" data-value="6">6</button>
+        <button class="btn red" data-value="-">−</button>
+
+        <button class="btn dark" data-value="1">1</button>
+        <button class="btn dark" data-value="2">2</button>
+        <button class="btn dark" data-value="3">3</button>
+        <button class="btn red" data-value="+">+</button>
+
+        <button class="btn dark" data-value="0">0</button>
+        <button class="btn dark" data-value=".">.</button>
+        <button class="btn dark" data-value="DEL">⌫</button>
+        <button class="btn red" data-value="=">=</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const resultDisplay = document.getElementById("result");
+  let currentInput = "";
+  let evaluated = false;
+
+  const buttons = document.querySelectorAll(".btn");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      const value = button.getAttribute("data-value");
+
+      // Clear everything
+      if (value === "C") {
+        currentInput = "";
+        resultDisplay.textContent = "0";
+        return;
+      }
+
+      // Delete last character
+      if (value === "DEL") {
+        currentInput = currentInput.slice(0, -1);
+        resultDisplay.textContent = currentInput || "0";
+        return;
+      }
+
+      // Evaluate expression
+      if (value === "=") {
+        try {
+          let expression = currentInput
+            .replace(/×/g, "*")
+            .replace(/÷/g, "/");
+
+          const result = eval(expression);
+          currentInput = result.toString();
+          resultDisplay.textContent = currentInput;
+          evaluated = true;
+        } catch {
+          resultDisplay.textContent = "Error";
+          currentInput = "";
+        }
+        return;
+      }
+
+      // Negate current value
+      if (value === "+/-") {
+        if (currentInput) {
+          if (currentInput.startsWith("-")) {
+            currentInput = currentInput.substring(1);
+          } else {
+            currentInput = "-" + currentInput;
+          }
+          resultDisplay.textContent = currentInput;
+        }
+        return;
+      }
+
+      // Convert to percentage
+      if (value === "%") {
+        try {
+          currentInput = (parseFloat(currentInput) / 100).toString();
+          resultDisplay.textContent = currentInput;
+        } catch {
+          resultDisplay.textContent = "Error";
+          currentInput = "";
+        }
+        return;
+      }
+
+      // Scientific functions evaluate instantly
+      if (["sin", "cos", "tan", "√"].includes(value)) {
+        try {
+          let num = parseFloat(currentInput || "0");
+          let result = 0;
+          switch (value) {
+            case "sin":
+              result = Math.sin(num * Math.PI / 180); // degrees
+              break;
+            case "cos":
+              result = Math.cos(num * Math.PI / 180);
+              break;
+            case "tan":
+              result = Math.tan(num * Math.PI / 180);
+              break;
+            case "√":
+              result = Math.sqrt(num);
+              break;
+          }
+          currentInput = result.toString();
+          resultDisplay.textContent = currentInput;
+          evaluated = true;
+        } catch {
+          resultDisplay.textContent = "Error";
+          currentInput = "";
+        }
+        return;
+      }
+
+      // Reset after evaluation if new input is not an operator
+      if (evaluated && !["+", "-", "*", "/", "×", "÷"].includes(value)) {
+        currentInput = "";
+      }
+
+      evaluated = false;
+
+      // Prevent multiple leading zeros
+      if (value === "0") {
+        if (currentInput === "0") return;
+      }
+
+      // Replace leading 0 unless entering a decimal
+      if (value !== "." && currentInput === "0") {
+        currentInput = "";
+      }
+
+      // Prevent consecutive decimals
+      if (value === "." && currentInput.endsWith(".")) return;
+
+      currentInput += value;
+      resultDisplay.textContent = currentInput;
+    });
+  });
+</script>
+</body>
+</html>
